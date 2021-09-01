@@ -1,6 +1,8 @@
 import {Component} from 'react'
 import Cookies from 'js-cookie'
 import Loader from 'react-loader-spinner'
+import SkillItem from './SkillItem'
+import SimilarJobItem from './SimilarJobItem'
 import Navbar from '../Navbar'
 import './index.css'
 
@@ -89,14 +91,14 @@ class JobItemDetails extends Component {
     const {jobDetails} = this.state
     const {skills} = jobDetails
     return (
-      <ul>
-        {skills.map(item => (
-          <li>
-            <img alt={item.name} src={item.imageUrl} />
-            <p>{item.name}</p>
-          </li>
-        ))}
-      </ul>
+      <div>
+        <p>Skills</p>
+        <ul>
+          {skills.map(item => (
+            <SkillItem key={item.name} item={item} />
+          ))}
+        </ul>
+      </div>
     )
   }
 
@@ -104,28 +106,9 @@ class JobItemDetails extends Component {
     const {similarJobs} = this.state
     return (
       <ul>
-        {similarJobs.map(item => {
-          const {
-            companyLogoUrl,
-            employmentType,
-            id,
-            jobDescription,
-            location,
-            rating,
-            title,
-          } = item
-          return (
-            <li key={id}>
-              <h1>{title}</h1>
-              <img src={companyLogoUrl} alt="similar job company logo" />
-              <p>{employmentType}</p>
-              <h1>Description</h1>
-              <p>{jobDescription}</p>
-              <p>{location}</p>
-              <p>{rating}</p>
-            </li>
-          )
-        })}
+        {similarJobs.map(item => (
+          <SimilarJobItem key={item.id} item={item} />
+        ))}
       </ul>
     )
   }
@@ -155,7 +138,6 @@ class JobItemDetails extends Component {
           <p>{location}</p>
           <p>{packagePerAnnum}</p>
           <p>{rating}</p>
-          <p>Skills</p>
           {this.renderSkills()}
           <h1>Life at Company</h1>
           <p>{lifeAtCompany.description}</p>

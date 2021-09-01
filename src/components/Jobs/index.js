@@ -1,8 +1,9 @@
 import {Component} from 'react'
-import {Link} from 'react-router-dom'
 import Cookies from 'js-cookie'
 import Loader from 'react-loader-spinner'
+import {BsSearch} from 'react-icons/bs'
 import Navbar from '../Navbar'
+import JobItem from './JobItem'
 import './index.css'
 
 const employmentTypesList = [
@@ -61,13 +62,11 @@ class Jobs extends Component {
 
   componentDidMount = () => {
     this.getData()
+    this.getData1()
   }
 
   getData = async () => {
     this.setState({currentStatus: apiStatus.loading})
-    const {employment, salary, search} = this.state
-    const employmentParam = employment.join(',')
-    console.log(employmentParam)
     const jwtToken = Cookies.get('jwt_token')
     const options = {
       method: 'GET',
@@ -80,32 +79,51 @@ class Jobs extends Component {
     const response = await fetch('https://apis.ccbp.in/profile', options)
     if (response.ok === true) {
       const data = await response.json()
-      const response1 = await fetch(
-        `https://apis.ccbp.in/jobs?employment_type=${employmentParam}&minimum_package=${salary}&search=${search}`,
-        options,
-      )
-      if (response1.ok === true) {
-        const data1 = await response1.json()
-        const profileData = {
-          name: data.profile_details.name,
-          profileImageUrl: data.profile_details.profile_image_url,
-          shortBio: data.profile_details.short_bio,
-        }
-        const jobsData = data1.jobs.map(item => ({
-          companyLogoUrl: item.company_logo_url,
-          employmentType: item.employment_type,
-          id: item.id,
-          jobDescription: item.job_description,
-          location: item.location,
-          packagePerAnnum: item.package_per_annum,
-          rating: item.rating,
-          title: item.title,
-        }))
-        this.setState({profileData, jobsData, currentStatus: apiStatus.success})
-        // console.log(profileData, jobsData)
-      } else {
-        this.setState({currentStatus: apiStatus.failure})
+      const profileData = {
+        name: data.profile_details.name,
+        profileImageUrl: data.profile_details.profile_image_url,
+        shortBio: data.profile_details.short_bio,
       }
+      this.setState({profileData, currentStatus: apiStatus.success})
+      // console.log(profileData, jobsData)
+    } else {
+      this.setState({currentStatus: apiStatus.failure})
+    }
+  }
+
+  getData1 = async () => {
+    const {employment, salary, search} = this.state
+    const employmentParam = employment.join(',')
+    console.log(employmentParam)
+    const jwtToken = Cookies.get('jwt_token')
+    const options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }
+    const response1 = await fetch(
+      `https://apis.ccbp.in/jobs?employment_type=${employmentParam}&minimum_package=${salary}&search=${search}`,
+      options,
+    )
+    if (response1.ok === true) {
+      const data1 = await response1.json()
+      if (data1.jobs === []) {
+        this.setState({jobsData: [], currentStatus: apiStatus.success})
+      }
+      const jobsData = data1.jobs.map(item => ({
+        companyLogoUrl: item.company_logo_url,
+        employmentType: item.employment_type,
+        id: item.id,
+        jobDescription: item.job_description,
+        location: item.location,
+        packagePerAnnum: item.package_per_annum,
+        rating: item.rating,
+        title: item.title,
+      }))
+      this.setState({jobsData, currentStatus: apiStatus.success})
     } else {
       this.setState({currentStatus: apiStatus.failure})
     }
@@ -117,10 +135,10 @@ class Jobs extends Component {
     if (presence.length === 0) {
       this.setState(
         prev => ({employment: [...prev.employment, id]}),
-        this.getData,
+        this.getData1,
       )
     }
-    console.log(employment)
+    // console.log(employment)
   }
 
   removeEmploymentId = id => {
@@ -131,10 +149,18 @@ class Jobs extends Component {
         prev => ({
           employment: prev.employment.filter(item => item !== id),
         }),
-        this.getData,
+        this.getData1,
       )
     }
-    console.log(employment)
+    // console.log(employment)
+  }
+
+  getSearchValue = e => {
+    this.setState({search: e.target.value})
+  }
+
+  updateJobs = () => {
+    this.getData1()
   }
 
   renderSuccessView = () => {
@@ -148,7 +174,12 @@ class Jobs extends Component {
           <img alt="profile" src={profileImageUrl} />
           <p>{shortBio}</p>
         </div>
+        <input type="search" onChange={this.getSearchValue} />
+        <button onClick={this.updateJobs} type="button" testid="searchButton">
+          <BsSearch className="search-icon" />
+        </button>
         <div className="employment-type-container">
+          <h1>Type of Employment</h1>
           <ul>
             {employmentTypesList.map(item => {
               const getId = e => {
@@ -173,6 +204,7 @@ class Jobs extends Component {
           </ul>
         </div>
         <div className="salary-container">
+          <h1>Salary Range</h1>
           <ul>
             {salaryRangesList.map(item => (
               <li key={item.salaryRangeId}>
@@ -190,32 +222,22 @@ class Jobs extends Component {
         </div>
         <div className="jobs-container">
           <ul>
-            {jobsData.map(item => {
-              const {
-                companyLogoUrl,
-                employmentType,
-                id,
-                jobDescription,
-                location,
-                packagePerAnnum,
-                rating,
-                title,
-              } = item
-              return (
-                <Link key={id} to={`/jobs/${id}`}>
-                  <li>
-                    <h1>{title}</h1>
-                    <p>{rating}</p>
-                    <p>{packagePerAnnum}</p>
-                    <p>{location}</p>
-                    <p>Description</p>
-                    <p>{jobDescription}</p>
-                    <p>{employmentType}</p>
-                    <img alt="company logo" src={companyLogoUrl} />
-                  </li>
-                </Link>
-              )
-            })}
+            {jobsData.length === 0 ? (
+              <div>
+                <img
+                  src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
+                  alt="no jobs"
+                />
+                <h1>No Jobs Found</h1>
+                <p>We could not find any jobs. Try other filters</p>
+              </div>
+            ) : (
+              <div>
+                {jobsData.map(item => (
+                  <JobItem key={item.id} item={item} />
+                ))}
+              </div>
+            )}
           </ul>
         </div>
       </div>

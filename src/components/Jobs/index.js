@@ -221,24 +221,18 @@ class Jobs extends Component {
           </ul>
         </div>
         <div className="jobs-container">
-          <ul>
-            {jobsData.length === 0 ? (
-              <div>
-                <img
-                  src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
-                  alt="no jobs"
-                />
-                <h1>No Jobs Found</h1>
-                <p>We could not find any jobs. Try other filters</p>
-              </div>
-            ) : (
-              <div>
-                {jobsData.map(item => (
-                  <JobItem key={item.id} item={item} />
-                ))}
-              </div>
-            )}
-          </ul>
+          {jobsData.length === 0 ? (
+            <div>
+              <img
+                alt="no jobs"
+                src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
+              />
+              <h1>No Jobs Found</h1>
+              <p>We could not find any jobs. Try other filters</p>
+            </div>
+          ) : (
+            jobsData.map(item => <JobItem key={item.id} item={item} />)
+          )}
         </div>
       </div>
     )
@@ -252,6 +246,7 @@ class Jobs extends Component {
 
   refresh = () => {
     this.getData()
+    this.getData1()
   }
 
   renderFailureView = () => (

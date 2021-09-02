@@ -92,7 +92,6 @@ class JobItemDetails extends Component {
     const {skills} = jobDetails
     return (
       <div>
-        <p>Skills</p>
         <ul>
           {skills.map(item => (
             <SkillItem key={item.name} item={item} />
@@ -134,10 +133,12 @@ class JobItemDetails extends Component {
           <img alt="job details company logo" src={jobDetailsCompanyLogo} />
           <a href={companyWebsiteUrl}>Visit</a>
           <p>{employmentType}</p>
+          <h1>Description</h1>
           <p>{jobDescription}</p>
           <p>{location}</p>
           <p>{packagePerAnnum}</p>
           <p>{rating}</p>
+          <p>Skills</p>
           {this.renderSkills()}
           <h1>Life at Company</h1>
           <p>{lifeAtCompany.description}</p>

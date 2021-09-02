@@ -92,6 +92,7 @@ class Jobs extends Component {
   }
 
   getData1 = async () => {
+    this.setState({currentStatus: apiStatus.loading})
     const {employment, salary, search} = this.state
     const employmentParam = employment.join(',')
     console.log(employmentParam)
@@ -163,6 +164,11 @@ class Jobs extends Component {
     this.getData1()
   }
 
+  changeValue = e => {
+    this.setState({salary: e.target.value}, this.getData1)
+    console.log(e.target.value)
+  }
+
   renderSuccessView = () => {
     const {profileData, jobsData} = this.state
     const {name, shortBio, profileImageUrl} = profileData
@@ -205,11 +211,10 @@ class Jobs extends Component {
         </div>
         <div className="salary-container">
           <h1>Salary Range</h1>
-          <ul>
+          <ul onChange={this.changeValue}>
             {salaryRangesList.map(item => (
               <li key={item.salaryRangeId}>
                 <input
-                  onChange={this.setSalary}
                   type="radio"
                   name="salary"
                   value={item.salaryRangeId}

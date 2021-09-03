@@ -95,7 +95,10 @@ class JobsList extends Component {
         rating: item.rating,
         title: item.title,
       }))
-      this.setState({jobsData, currentStatus: apiStatus.success})
+      this.setState(
+        {jobsData, currentStatus: apiStatus.success},
+        this.renderJobs,
+      )
     } else {
       this.setState({currentStatus: apiStatus.failure})
     }
@@ -140,8 +143,65 @@ class JobsList extends Component {
     console.log(e.target.value)
   }
 
-  renderSuccessView = () => {
+  renderJobs = () => {
     const {jobsData} = this.state
+    return (
+      <div className="jobs-container">
+        {jobsData.length === 0 ? (
+          <div>
+            <img
+              alt="no jobs"
+              src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
+            />
+            <h1>No Jobs Found</h1>
+            <p>We could not find any jobs. Try other filters</p>
+          </div>
+        ) : (
+          jobsData.map(item => <JobItem key={item.id} item={item} />)
+        )}
+      </div>
+    )
+  }
+
+  renderLoadingView = () => (
+    <div className="loader-container" testid="loader">
+      <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
+    </div>
+  )
+
+  refresh = () => {
+    this.getData1()
+  }
+
+  renderFailureView = () => (
+    <div>
+      <h1>Oops! Something Went Wrong</h1>
+      <p>We cannot seem to find the page you are looking for</p>
+      <img
+        src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
+        alt="failure view"
+      />
+      <button onClick={this.refresh} type="button">
+        Retry
+      </button>
+    </div>
+  )
+
+  renderJobsView = () => {
+    const {currentStatus} = this.state
+    switch (currentStatus) {
+      case apiStatus.success:
+        return this.renderJobs()
+      case apiStatus.failure:
+        return this.renderFailureView()
+      case apiStatus.loading:
+        return this.renderLoadingView()
+      default:
+        return null
+    }
+  }
+
+  render() {
     return (
       <div>
         <input type="search" onChange={this.getSearchValue} />
@@ -189,60 +249,10 @@ class JobsList extends Component {
             ))}
           </ul>
         </div>
-        <div className="jobs-container">
-          {jobsData.length === 0 ? (
-            <div>
-              <img
-                alt="no jobs"
-                src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
-              />
-              <h1>No Jobs Found</h1>
-              <p>We could not find any jobs. Try other filters</p>
-            </div>
-          ) : (
-            jobsData.map(item => <JobItem key={item.id} item={item} />)
-          )}
-        </div>
+        {this.renderJobsView()}
       </div>
     )
   }
-
-  renderLoadingView = () => (
-    <div className="loader-container" testid="loader">
-      <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
-    </div>
-  )
-
-  refresh = () => {
-    this.getData1()
-  }
-
-  renderFailureView = () => (
-    <div>
-      <h1>Oops! Something Went Wrong</h1>
-      <p>We cannot seem to find the page you are looking for</p>
-      <img
-        src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
-        alt="failure view"
-      />
-      <button onClick={this.refresh} type="button">
-        Retry
-      </button>
-    </div>
-  )
-
-  render() {
-    const {currentStatus} = this.state
-    switch (currentStatus) {
-      case apiStatus.success:
-        return this.renderSuccessView()
-      case apiStatus.failure:
-        return this.renderFailureView()
-      case apiStatus.loading:
-        return this.renderLoadingView()
-      default:
-        return null
-    }
-  }
 }
+
 export default JobsList

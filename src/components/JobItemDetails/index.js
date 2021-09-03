@@ -138,7 +138,7 @@ class JobItemDetails extends Component {
           <p>{location}</p>
           <p>{packagePerAnnum}</p>
           <p>{rating}</p>
-          <p>Skills</p>
+          <h1>Skills</h1>
           {this.renderSkills()}
           <h1>Life at Company</h1>
           <p>{lifeAtCompany.description}</p>

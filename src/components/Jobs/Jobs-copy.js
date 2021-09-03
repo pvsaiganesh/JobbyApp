@@ -2,7 +2,6 @@ import {Component} from 'react'
 import Cookies from 'js-cookie'
 import Loader from 'react-loader-spinner'
 import {BsSearch} from 'react-icons/bs'
-import Navbar from '../Navbar'
 import JobItem from './JobItem'
 import './index.css'
 
@@ -50,45 +49,17 @@ const apiStatus = {
   success: 'SUCCESS',
 }
 
-class Jobs extends Component {
+class JobsList1 extends Component {
   state = {
     employment: [],
     salary: '',
     search: '',
-    profileData: [],
     jobsData: [],
     currentStatus: apiStatus.initial,
   }
 
   componentDidMount = () => {
-    this.getData()
     this.getData1()
-  }
-
-  getData = async () => {
-    this.setState({currentStatus: apiStatus.loading})
-    const jwtToken = Cookies.get('jwt_token')
-    const options = {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwtToken}`,
-      },
-    }
-    const response = await fetch('https://apis.ccbp.in/profile', options)
-    if (response.ok === true) {
-      const data = await response.json()
-      const profileData = {
-        name: data.profile_details.name,
-        profileImageUrl: data.profile_details.profile_image_url,
-        shortBio: data.profile_details.short_bio,
-      }
-      this.setState({profileData, currentStatus: apiStatus.success})
-      // console.log(profileData, jobsData)
-    } else {
-      this.setState({currentStatus: apiStatus.failure})
-    }
   }
 
   getData1 = async () => {
@@ -170,16 +141,9 @@ class Jobs extends Component {
   }
 
   renderSuccessView = () => {
-    const {profileData, jobsData} = this.state
-    const {name, shortBio, profileImageUrl} = profileData
+    const {jobsData} = this.state
     return (
       <div>
-        <Navbar />
-        <div className="profile-container">
-          <h1>{name}</h1>
-          <img alt="profile" src={profileImageUrl} />
-          <p>{shortBio}</p>
-        </div>
         <input type="search" onChange={this.getSearchValue} />
         <button onClick={this.updateJobs} type="button" testid="searchButton">
           <BsSearch className="search-icon" />
@@ -250,7 +214,6 @@ class Jobs extends Component {
   )
 
   refresh = () => {
-    this.getData()
     this.getData1()
   }
 
@@ -282,4 +245,4 @@ class Jobs extends Component {
     }
   }
 }
-export default Jobs
+export default JobsList1
